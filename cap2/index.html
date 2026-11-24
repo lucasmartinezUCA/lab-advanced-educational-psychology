@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The hidden dimension: one question, three kinds of evidence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* identity shared with the Production Architecture Lab */
+  --gold:#cfaa65; --label:#206582; --title:#092f49; --text:#33444f; --muted:#677884;
+  --line:#d9e6ea; --line2:#cbdce1; --tile:#eef4f5; --item:#f8fbfb;
+  --primary:#104f6d; --primary-h:#0b3d55; --bad:#c9463b; --bad-bg:#fcf0ee;
+  /* names used by the lab script */
+  --ink:var(--title); --ink-2:var(--text); --ink-3:var(--muted);
+  --paper:#ffffff; --panel:#ffffff; --chamber:var(--tile);
+  --indigo:#104f6d;           /* neutral student, published study, primary */
+  --good:#104f6d;             /* reading after the threat is addressed */
+  --plum:#6a57d6;             /* prior achievement, built-in effect (R&D purple family) */
+  --amber:#b98a2e;            /* face-value reading, program group (assembly gold family) */
+  --teal:#2b9c74;             /* comparison group (market green family) */
+  --red:#c9463b; --ok:#2b9c74;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:"DM Sans",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:transparent;color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.55}
+[hidden]{display:none!important}
+
+.lab{max-width:1240px;margin:0 auto;height:var(--appH,720px);display:flex;flex-direction:column;
+  background:#fff;border:1px solid #d8e6ea;border-top:4px solid var(--gold);border-radius:16px;padding:16px 20px 18px}
+.head{display:grid;grid-template-columns:1fr auto;gap:0 24px;align-items:start;margin-bottom:12px;flex:none}
+.kicker{display:block;font-size:.76rem;font-weight:700;letter-spacing:.09em;color:var(--label);margin-bottom:4px}
+.head h2{font-family:var(--serif);font-weight:700;font-size:1.5rem;line-height:1.2;margin:0 0 6px;color:var(--title);letter-spacing:-.005em}
+.head .q{grid-column:1/-1;margin:0;color:var(--text);max-width:98ch;font-size:.92rem;line-height:1.55}
+.head .q strong{color:var(--title);font-weight:700}
+.head .note-ill{grid-column:1/-1;margin:2px 0 0;font-size:.78rem;color:var(--muted)}
+.reset{font:inherit;font-size:.78rem;font-weight:700;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:7px 15px;cursor:pointer;align-self:start}
+.reset:hover{border-color:var(--primary);background:var(--tile)}
+
+.stage{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);grid-template-rows:minmax(0,1fr);gap:16px}
+.main{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0}
+.viewport{position:relative;flex:1;min-height:0;border-radius:14px;border:1px solid var(--line);overflow:hidden;
+  background:radial-gradient(110% 85% at 50% 42%,#fff,#eef4f5 58%,#e2ecef)}
+#cv{display:block;width:100%;height:100%;touch-action:none;cursor:grab;outline:none}
+#cv:active{cursor:grabbing}
+#cv:focus-visible{box-shadow:inset 0 0 0 2px var(--primary)}
+.views{position:absolute;right:10px;top:10px;display:flex;gap:6px}
+.views button{font:inherit;font-size:.78rem;font-weight:700;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:6px 13px;cursor:pointer}
+.views button:hover{border-color:var(--primary);background:var(--tile)}
+.readout{position:absolute;left:10px;top:10px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;max-width:60%}
+.stat{background:#fff;border:1px solid var(--line2);border-radius:999px;padding:4px 12px 4px 10px;font-size:.78rem;font-weight:600;color:var(--muted);box-shadow:0 1px 2px #092f4914;display:flex;align-items:baseline;gap:6px}
+.stat::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--line2);align-self:center;flex:none}
+.stat b{font-family:var(--serif);font-size:1.05rem;color:var(--title);font-weight:700;font-variant-numeric:tabular-nums}
+.stat.naive::before{background:#fff;box-shadow:inset 0 0 0 2px var(--amber)}
+.stat.better::before{background:var(--good)}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.74rem;color:var(--muted);background:#ffffffd9;padding:3px 10px;border-radius:999px;pointer-events:none}
+.legend{position:absolute;right:10px;bottom:10px;font-size:.74rem;color:var(--text);background:#ffffffeb;border:1px solid var(--line);border-radius:12px;padding:7px 11px;display:flex;flex-direction:column;gap:3px;max-width:220px}
+.legend .ramp{height:7px;border-radius:4px;background:linear-gradient(90deg,#e4defb,#3b2d8f);margin:2px 0 0}
+.legend .ends{display:flex;justify-content:space-between;color:var(--muted)}
+.sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.fallback{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(420px,86%);text-align:center;color:var(--title);font-size:.9rem;background:#fff;border:1px solid var(--line2);border-radius:12px;padding:16px 18px}
+
+.panel{display:flex;flex-direction:column;min-height:0;min-width:0}
+.steps{display:flex;gap:4px;background:var(--tile);padding:4px;border-radius:10px;flex:none}
+.steps button{flex:1;font:inherit;font-size:.8rem;font-weight:700;line-height:1.2;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:8px;padding:8px 4px;cursor:pointer;text-align:center}
+.steps button .n{margin-right:4px}
+.steps button[aria-selected="true"]{background:#fff;color:var(--title);border-color:var(--line2)}
+.steps button[aria-disabled="true"]{cursor:not-allowed;opacity:.5}
+.steps button.done .n::after{content:"✓";color:var(--ok);margin-left:3px}
+.locknote{margin:10px 0 0;padding:9px 12px;border-radius:10px;font-size:.84rem;background:#fbf5e8;border-left:3px solid var(--gold);color:var(--text)}
+.step{padding:14px 2px 6px 0;overflow:auto;flex:1;min-height:0;position:relative;overscroll-behavior:contain}
+.step h3{font-family:var(--serif);font-weight:700;font-size:1.15rem;margin:0 0 6px;line-height:1.25;color:var(--title)}
+.step p{margin:0 0 10px;color:var(--text);font-size:.88rem}
+.step p.task{color:var(--title);font-weight:600}
+.predict{background:var(--item);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin:0 0 12px}
+.predict p{margin:0 0 8px;color:var(--title);font-size:.86rem;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:.78rem;font-weight:700;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:6px 13px;cursor:pointer}
+.chip:hover{border-color:var(--primary);background:var(--tile)}
+.chip[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.chip:disabled{cursor:default}
+.chip:disabled:not([aria-pressed="true"]){opacity:.55}
+.seg{display:flex;gap:6px;margin:0 0 10px}
+.seg button{flex:1;font:inherit;font-size:.78rem;font-weight:700;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:7px 12px;cursor:pointer;line-height:1.2}
+.seg button:hover{border-color:var(--primary)}
+.seg button[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:#fff}
+.act{display:block;width:100%;font:inherit;font-size:.86rem;font-weight:700;border:0;border-radius:8px;padding:11px 18px;background:var(--primary);color:#fff;cursor:pointer;margin:0 0 10px}
+.act:hover{background:var(--primary-h)}
+.act:disabled{background:var(--line2);color:var(--muted);cursor:not-allowed}
+.act.quiet{width:auto;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:999px;font-size:.78rem;padding:7px 15px}
+.act.quiet:hover{border-color:var(--primary);background:var(--tile)}
+.tog{display:flex;gap:8px;align-items:flex-start;font-size:.84rem;color:var(--text);margin:0 0 8px;cursor:pointer}
+.tog input{margin-top:3px;accent-color:var(--primary)}
+.note{background:var(--item);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin:4px 0 10px;font-size:.86rem;color:var(--text)}
+.note p{margin:0 0 6px;color:var(--text);font-size:.86rem}
+.note p:last-child{margin:0}
+.note strong{color:var(--title)}
+.note.warn{background:#fbf5e8;border-color:#ecdcb6;border-left:3px solid var(--gold)}
+.limits{font-size:.84rem;color:var(--text);margin:0 0 10px;border-left:3px solid var(--gold);padding:2px 0 2px 12px}
+.limits dt{font-weight:700;color:var(--title)}
+.limits dd{margin:0 0 6px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:.86rem;color:var(--title);background:#fff;border:1px solid var(--line2);border-radius:12px;padding:10px 13px;margin:0 0 8px;cursor:pointer}
+.opt:hover{border-color:var(--primary)}
+.opt.right{border-color:var(--ok);background:#ecf7f2}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.small{font-size:.78rem;color:var(--muted)}
+.check{list-style:none;padding:0;margin:0 0 10px;font-size:.84rem}
+.check li{display:flex;gap:8px;align-items:baseline;color:var(--muted);margin:0 0 4px}
+.check li::before{content:"○";color:var(--line2);font-weight:700}
+.check li.ok{color:var(--title)}
+.check li.ok::before{content:"✓";color:var(--ok)}
+.check li.warn{color:var(--bad)}
+.check li.warn::before{content:"!";color:var(--bad)}
+
+.ruler{flex:none;background:var(--item);border:1px solid var(--line);border-radius:12px;padding:9px 14px 4px}
+.rhead{display:flex;justify-content:space-between;align-items:baseline;gap:6px 16px;flex-wrap:wrap}
+.ruler h4{font-size:.76rem;font-weight:700;letter-spacing:.06em;color:var(--label);margin:0}
+.ruler h4 span{font-weight:500;letter-spacing:0;font-size:.76rem;color:var(--muted);margin-left:6px}
+#rulerSvg{display:block;width:100%;height:150px;overflow:visible}
+.rkey{display:flex;gap:12px;flex-wrap:wrap;font-size:.74rem;color:var(--text)}
+.rkey span{display:inline-flex;align-items:center;gap:5px}
+.rkey span:nth-child(1){color:var(--amber)} .rkey span:nth-child(2){color:var(--good)} .rkey span:nth-child(3){color:var(--good)}
+.rkey span{font-weight:600}
+#rulerSvg .pop{transform-box:fill-box;transform-origin:center;animation:pop .7s ease-out}
+#rulerSvg .flash{animation:flash 1.6s ease-out forwards}
+@keyframes pop{0%{transform:scale(0)}55%{transform:scale(1.6)}100%{transform:scale(1)}}
+@keyframes flash{0%{opacity:.35}100%{opacity:0}}
+
+button:focus-visible,.chip:focus-visible,input:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* full screen, same behaviour as the Production Architecture Lab */
+.stage.fs-on{background:#fbfcfc;padding:16px;gap:16px;width:100%;height:100%;grid-template-columns:minmax(0,1fr) minmax(340px,420px)}
+.stage.fs-fallback{position:fixed;inset:0;z-index:2147483000;width:100vw;height:100vh;height:100dvh}
+.stage.fs-on #rulerSvg{height:170px}
+.views .fs-btn{margin-left:4px}
+@media (max-width:860px){
+  .stage.fs-on{grid-template-columns:1fr;grid-template-rows:minmax(0,1.6fr) minmax(0,1fr);padding:10px;gap:10px}
+  .stage.fs-on #rulerSvg{height:108px}
+}
+@media (max-height:700px) and (min-width:861px){ .head .q,.head .note-ill{display:none} }
+.short .head .q,.short .head .note-ill{display:none}
+@media (max-width:860px){
+  .lab{padding:10px 10px 12px;border-radius:14px}
+  .stage{grid-template-columns:1fr;grid-template-rows:minmax(0,1.75fr) minmax(0,1fr);gap:10px}
+  .main{gap:8px}
+  .head{margin-bottom:8px}
+  .kicker{font-size:.68rem;margin-bottom:2px}
+  .head h2{font-size:1.12rem;margin:0}
+  .head .q,.head .note-ill,.ruler h4 span{display:none}
+  .reset{padding:5px 11px;font-size:.72rem}
+  .readout{max-width:62%}
+  .stat{font-size:.7rem;padding:3px 9px 3px 8px}
+  .stat b{font-size:.92rem}
+  .views{top:auto;bottom:8px;right:8px;gap:4px}
+  .views button{padding:5px 10px;font-size:.72rem}
+  .legend,.hint{display:none}
+  .ruler{padding:6px 10px 2px}
+  #rulerSvg{height:108px}
+  .rkey{font-size:.68rem;gap:8px}
+  .step{padding:10px 0 6px}
+  .steps button{padding:6px 2px;font-size:.72rem}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+<div class="lab" id="lab">
+  <header class="head">
+    <div><span class="kicker">Interactive 3D Lab</span>
+    <h2>The Hidden Dimension: One Question, Three Kinds of Evidence</h2></div>
+    <button class="reset" id="resetBtn" type="button">Start over</button>
+    <p class="q">One question runs through this lab: <strong>does raising students’ motivation raise their grades?</strong> You will examine it through a correlational survey, a classroom comparison and a research synthesis, then decide what the combined evidence can support.</p>
+    <p class="note-ill">The values are simulated. The lab models the reasoning discussed in this section, not real study results.</p>
+  </header>
+
+  <div class="stage" id="stage">
+    <div class="main">
+    <div class="viewport" id="viewport">
+      <canvas id="cv" tabindex="0" aria-label="Three-dimensional evidence scene. Drag or use the arrow keys to rotate, scroll or press plus and minus to zoom."></canvas>
+      <div class="readout" id="readout" aria-hidden="true"></div>
+      <div class="views" role="group" aria-label="Camera views">
+        <button type="button" data-view="front">Front</button>
+        <button type="button" data-view="side">Side</button>
+        <button type="button" data-view="top">Top</button>
+        <button type="button" id="fsBtn" class="fs-btn" aria-pressed="false">Full screen</button>
+      </div>
+      <div class="legend" id="legend"></div>
+      <div class="hint" id="hint">Drag to rotate. Scroll or pinch to zoom.</div>
+      <div class="fallback" id="fallback" hidden>The 3D scene could not start in this browser. The steps on the right still work, and the evidence ruler below records your results.</div>
+    </div>
+
+      <section class="ruler" aria-labelledby="rulerTitle">
+        <div class="rhead">
+          <h4 id="rulerTitle">Evidence ruler <span>effect in SD units of grades</span></h4>
+          <div class="rkey">
+            <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.3" fill="none" stroke="currentColor" stroke-width="2"/></svg>Face value</span>
+            <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="currentColor"/></svg>Threat addressed</span>
+            <span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="2.5" fill="currentColor" opacity=".55"/></svg>One lottery</span>
+          </div>
+        </div>
+        <svg id="rulerSvg" role="img" aria-label="Evidence ruler"></svg>
+        <p class="sr" id="rulerText" aria-live="polite"></p>
+      </section>
+    </div>
+
+    <aside class="panel">
+      <div class="steps" role="tablist" aria-label="Lab steps">
+        <button role="tab" id="tab0" aria-controls="step0" aria-selected="true"><span class="n">1</span>Survey</button>
+        <button role="tab" id="tab1" aria-controls="step1" aria-selected="false" aria-disabled="true"><span class="n">2</span>Classes</button>
+        <button role="tab" id="tab2" aria-controls="step2" aria-selected="false" aria-disabled="true"><span class="n">3</span>Synthesis</button>
+        <button role="tab" id="tab3" aria-controls="step3" aria-selected="false" aria-disabled="true"><span class="n">4</span>Verdict</button>
+      </div>
+      <div class="locknote" id="lockNote" role="status" hidden></div>
+
+      <!-- STEP 1 -->
+      <section class="step" id="step0" role="tabpanel" aria-labelledby="tab0">
+        <h3>A strong correlation</h3>
+        <p>A district survey of 120 students measured motivation and grades. From the front, each dot is one student and the cloud rises steadily to the right.</p>
+        <div class="predict" id="pred0">
+          <p>Before you explore: if you compared only students who started the year at a similar level, what would happen to this link?</p>
+          <div class="chips" role="group" aria-label="Your prediction">
+            <button class="chip" type="button" data-p="same" aria-pressed="false">It stays as strong</button>
+            <button class="chip" type="button" data-p="weaker" aria-pressed="false">It gets weaker</button>
+            <button class="chip" type="button" data-p="reverse" aria-pressed="false">It reverses</button>
+          </div>
+        </div>
+        <p class="task" id="task0">Now rotate the cloud. A third variable is hiding in its depth. Turn the scene until you can see it.</p>
+        <div id="found0" hidden>
+          <div class="note"><p>The depth axis is <strong>prior achievement</strong>. Students who started ahead tend to be more motivated <em>and</em> to earn higher grades. The darker the dot, the higher the student’s starting point.</p></div>
+          <button class="act" id="bandBtn" type="button">Hold prior achievement constant</button>
+        </div>
+        <div id="after0" hidden>
+          <div class="note" id="fb0"></div>
+          <dl class="limits">
+            <dt>What this design can tell you</dt><dd>The strength and direction of an association, and where to look next.</dd>
+            <dt>What it cannot tell you</dt><dd>What would happen if a teacher actually raised motivation. A third variable, or reverse causation, may sit behind the pattern.</dd>
+          </dl>
+          <button class="act quiet" type="button" data-go="1">Continue to the classroom comparison</button>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" id="step1" role="tabpanel" aria-labelledby="tab1" hidden>
+        <h3>Two classes, one program</h3>
+        <p id="intro1">A school pilots a motivation program in Class A, its advanced track. Class B continues as usual. Each column is a student’s score; the dot on top shows prior achievement.</p>
+        <div class="predict" id="pred1">
+          <p>When the school compares final scores, how much of the gap will the program explain?</p>
+          <div class="chips" role="group" aria-label="Your prediction">
+            <button class="chip" type="button" data-p="all" aria-pressed="false">Almost all of it</button>
+            <button class="chip" type="button" data-p="half" aria-pressed="false">About half</button>
+            <button class="chip" type="button" data-p="small" aria-pressed="false">A small part</button>
+          </div>
+        </div>
+        <div class="seg" role="group" aria-label="How students are placed in the program">
+          <button type="button" id="modeExisting" aria-pressed="true">Existing classes</button>
+          <button type="button" id="modeRandom" aria-pressed="false">Assign by chance</button>
+        </div>
+        <button class="act" id="runBtn" type="button">Run the study</button>
+        <label class="tog"><input type="checkbox" id="preTog"> Show pretest scores (ghost columns)</label>
+        <label class="tog"><input type="checkbox" id="dropTog"> Some low scorers leave the program class before the posttest (try it, then untick it)</label>
+        <div id="fb1" aria-live="polite"></div>
+        <ul class="check" id="gate1" aria-live="polite"></ul>
+        <div id="after1" hidden>
+          <dl class="limits">
+            <dt>What this design can tell you</dt><dd>With chance assignment, a causal effect of the program in these conditions, give or take sampling noise.</dd>
+            <dt>What it cannot tell you</dt><dd>Whether the same effect would appear in another school, age group or setting.</dd>
+          </dl>
+          <button class="act quiet" type="button" data-go="2">Continue to the research synthesis</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" id="step2" role="tabpanel" aria-labelledby="tab2" hidden>
+        <h3>What the literature says</h3>
+        <p>A review pools published evaluations of similar programs in four settings. Each sphere is a study: further right means a larger effect, higher up means a larger sample, and bigger spheres carry more weight.</p>
+        <div class="predict" id="pred2">
+          <p>Some studies were never published. The box beneath the plot holds them. What will the pooled effect do when they are added?</p>
+          <div class="chips" role="group" aria-label="Your prediction">
+            <button class="chip" type="button" data-p="up" aria-pressed="false">Rise</button>
+            <button class="chip" type="button" data-p="same" aria-pressed="false">Stay about the same</button>
+            <button class="chip" type="button" data-p="down" aria-pressed="false">Fall</button>
+          </div>
+        </div>
+        <button class="act" id="drawerBtn" type="button">Open the file drawer</button>
+        <label class="tog"><input type="checkbox" id="setTog" disabled> Show the pooled effect for each setting</label>
+        <div id="fb2" aria-live="polite"></div>
+        <div id="after2" hidden>
+          <dl class="limits">
+            <dt>What this design can tell you</dt><dd>The expected size of an effect and how much it varies across studies and settings.</dd>
+            <dt>What it cannot tell you</dt><dd>More than its studies allow. Missing studies and mixed settings shape the average.</dd>
+          </dl>
+          <button class="act quiet" type="button" data-go="3">Continue to the verdict</button>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" id="step3" role="tabpanel" aria-labelledby="tab3" hidden>
+        <h3>Your verdict</h3>
+        <p>Look at the evidence ruler below the scene. Hollow markers are readings that a reader could take at face value; filled markers are readings after the threat was addressed.</p>
+        <p class="task">Which conclusion does the combined evidence support?</p>
+        <div id="opts"></div>
+        <div id="fb3" aria-live="polite"></div>
+      </section>
+    </aside>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+"use strict";
+/* ---------- simulated data (seeded, reproducible) ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function makeData(seed){
+  const R=mulberry32(seed);
+  const rn=()=>{let u=0,v=0;while(!u)u=R();while(!v)v=R();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+  const N=120,S=[];
+  for(let i=0;i<N;i++){const P=rn();const M=0.75*P+0.66*rn();const G=0.65*P+0.15*M+0.55*rn();
+    S.push({P,M,G,track:P+2.0*rn(),ePost:0.35*rn()});}
+  const settings=[{name:'Primary school',mu:.30},{name:'Secondary school',mu:.18},{name:'Online course',mu:.12},{name:'University',mu:.04}];
+  const T=[];
+  for(let k=0;k<40;k++){const s=k%4;const n=Math.round(Math.exp(Math.log(24)+R()*(Math.log(360)-Math.log(24))));
+    const se=Math.sqrt(4/n+.0016);const d=settings[s].mu+se*rn();T.push({s,n,se,d,pub:(d/se>1.96)||R()<0.18});}
+  return {S,T,settings};
+}
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const sdv=a=>{const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1));};
+function corr(a,b){const ma=mean(a),mb=mean(b);let c=0,va=0,vb=0;for(let i=0;i<a.length;i++){c+=(a[i]-ma)*(b[i]-mb);va+=(a[i]-ma)**2;vb+=(b[i]-mb)**2;}return c/Math.sqrt(va*vb);}
+function slope(x,y){const mx=mean(x),my=mean(y);let c=0,v=0;for(let i=0;i<x.length;i++){c+=(x[i]-mx)*(y[i]-my);v+=(x[i]-mx)**2;}return {b:c/v,a:my-c/v*mx};}
+
+const STU=makeData(719).S, SYN=makeData(239);
+const STUDIES=SYN.T, SETTINGS=SYN.settings, N=STU.length;
+['P','M','G'].forEach(k=>{const a=STU.map(s=>s[k]),m=mean(a),d=sdv(a);STU.forEach(s=>s[k+'z']=(s[k]-m)/d);});
+[...STU.keys()].sort((a,b)=>STU[b].track-STU[a].track).forEach((idx,r)=>STU[idx].classA=r<N/2);
+const sdPre=sdv(STU.map(s=>s.G));
+const TRUE_EFFECT=0.20;
+const R_ALL=corr(STU.map(s=>s.M),STU.map(s=>s.G));
+const BANDS=(()=>{const o=[...STU.keys()].sort((a,b)=>STU[a].P-STU[b].P);return [o.slice(0,40),o.slice(40,80),o.slice(80)];})();
+BANDS.forEach((b,k)=>b.forEach(i=>STU[i].band=k));
+const R_BANDS=BANDS.map(b=>corr(b.map(i=>STU[i].M),b.map(i=>STU[i].G)));
+const R_WITHIN=mean(R_BANDS);
+const pool=T=>{let w=0,s=0;T.forEach(t=>{const wi=1/t.se**2;w+=wi;s+=wi*t.d;});return {d:s/w,se:Math.sqrt(1/w)};};
+const POOL_PUB=pool(STUDIES.filter(t=>t.pub)).d, POOL_ALL=pool(STUDIES).d;
+const POOL_SET=SETTINGS.map((_,i)=>pool(STUDIES.filter(t=>t.s===i)).d);
+/* The first twelve lotteries are genuine chance assignments, shown in an order that keeps
+   the running mean readable after only a few draws; later draws continue from fresh seeds. */
+const LOTTERY_SEEDS=[220,365,302,332,293,297,372,278,230,225,51,304];let lotteryN=0;
+const fmt=x=>(x<0?'−':'')+Math.abs(x).toFixed(2);
+
+/* ---------- state ---------- */
+const st={step:0,maxStep:0,pred:[null,null,null],revealed:false,banded:false,
+  mode:'existing',group:STU.map(s=>s.classA),ran:false,showPre:false,drop:false,
+  existingEst:null,lotteries:[],drawer:false,perSetting:false,verdict:null,done:[false,false,false,false]};
+
+/* ---------- DOM helpers ---------- */
+const $=id=>document.getElementById(id);
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+/* ---------- 3D ---------- */
+let THREEOK=typeof THREE!=='undefined';
+let renderer,scene,camera,canvas=$('cv');
+const G3={};
+const cam={theta:0,phi:0.04,r:24,tx:0,ty:0,tz:0, dTheta:0,dPhi:0.04,dR:24, dtx:0,dty:0,dtz:0};
+const RAMP_LO=[0xE4,0xDE,0xFB],RAMP_HI=[0x3B,0x2D,0x8F];
+function rampColor(t,out){t=Math.max(0,Math.min(1,t));out.setRGB((RAMP_LO[0]+(RAMP_HI[0]-RAMP_LO[0])*t)/255,(RAMP_LO[1]+(RAMP_HI[1]-RAMP_LO[1])*t)/255,(RAMP_LO[2]+(RAMP_HI[2]-RAMP_LO[2])*t)/255);return out;}
+
+function label(text,opt){
+  opt=opt||{};const size=opt.size||0.34,weight=opt.weight||600,color=opt.color||css('--ink')||'#1E2A3A';
+  const c=document.createElement('canvas'),x=c.getContext('2d'),fs=64;
+  x.font=`${weight} ${fs}px "DM Sans", Arial, sans-serif`;
+  const w=Math.ceil(x.measureText(text).width)+28;c.width=w;c.height=Math.round(fs*1.45);
+  x.font=`${weight} ${fs}px "DM Sans", Arial, sans-serif`;
+  if(opt.bg){x.fillStyle=opt.bg;const r=18;x.beginPath();x.moveTo(r,0);x.arcTo(w,0,w,c.height,r);x.arcTo(w,c.height,0,c.height,r);x.arcTo(0,c.height,0,0,r);x.arcTo(0,0,w,0,r);x.fill();}
+  x.fillStyle=color;x.textBaseline='middle';x.textAlign='center';x.fillText(text,w/2,c.height/2+2);
+  const tex=new THREE.CanvasTexture(c);tex.minFilter=THREE.LinearFilter;
+  const m=new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:false,depthWrite:false});
+  const s=new THREE.Sprite(m);s.scale.set(size*w/c.height,size,1);s.renderOrder=20;
+  if(opt.anchor==='left')s.center.set(0,0.5);if(opt.anchor==='right')s.center.set(1,0.5);
+  return s;
+}
+function lineMat(color,opacity){return new THREE.LineBasicMaterial({color,transparent:opacity!==undefined,opacity:opacity===undefined?1:opacity});}
+function seg(points,mat){const g=new THREE.BufferGeometry().setFromPoints(points.map(p=>new THREE.Vector3(p[0],p[1],p[2])));return new THREE.Line(g,mat);}
+function segs(pairs,mat){const pts=[];pairs.forEach(p=>{pts.push(new THREE.Vector3(...p[0]),new THREE.Vector3(...p[1]));});return new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts),mat);}
+
+/* students as instanced spheres + columns */
+let COL_T,COL_C;
+const SP={pos:[],tgt:[],scl:[],tScl:[],h:[],tH:[],gh:[],tGh:[]};
+const SCALE1=1.15;
+function initScene(){
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(26,1,0.1,200);
+  scene.add(new THREE.HemisphereLight(0xffffff,0x9aa3b5,0.85));
+  const dl=new THREE.DirectionalLight(0xffffff,0.55);dl.position.set(5,9,7);scene.add(dl);
+
+  const inkC=new THREE.Color(css('--ink')),ink3=new THREE.Color(css('--ink-3')),lineC=new THREE.Color(css('--line'));
+
+  /* lens 1: cube frame and axes */
+  const g1=new THREE.Group();G3.g1=g1;scene.add(g1);
+  const L=3.3,B=-L;
+  const frame=[[[B,B,B],[L,B,B]],[[B,B,B],[B,L,B]],[[B,B,B],[B,B,L]],[[L,B,B],[L,L,B]],[[B,L,B],[L,L,B]],[[L,B,B],[L,B,L]],[[B,B,L],[L,B,L]],[[B,L,B],[B,L,L]],[[B,B,L],[B,L,L]]];
+  g1.add(segs(frame,lineMat(ink3,0.55)));
+  const gridPairs=[];for(let k=-2;k<=2;k++){const v=k*1.1;gridPairs.push([[v,B,B],[v,L,B]],[[B,v,B],[L,v,B]]);}
+  g1.add(segs(gridPairs,lineMat(lineC,0.9)));
+  const lx=label('Motivation',{size:.34});lx.position.set(0,B-0.45,L);g1.add(lx);
+  const ly=label('Grades',{size:.34});ly.position.set(B-0.35,L+0.35,L);g1.add(ly);
+  G3.zQ=label('?',{size:.5,weight:700,color:css('--plum')});G3.zQ.position.set(L+0.45,B-0.2,0);g1.add(G3.zQ);
+  G3.zLab=label('Prior achievement',{size:.34,color:css('--plum')});G3.zLab.position.set(L+0.4,B-0.45,0);G3.zLab.visible=false;g1.add(G3.zLab);
+  G3.regAll=new THREE.Group();g1.add(G3.regAll);
+  G3.regBands=new THREE.Group();g1.add(G3.regBands);G3.regBands.visible=false;
+  const fitAll=slope(STU.map(s=>s.Mz*SCALE1),STU.map(s=>s.Gz*SCALE1));
+  G3.regAll.add(seg([[-3,fitAll.a+fitAll.b*-3,0],[3,fitAll.a+fitAll.b*3,0]],new THREE.LineBasicMaterial({color:new THREE.Color(css('--amber'))})));
+  BANDS.forEach((b,k)=>{
+    const xs=b.map(i=>STU[i].Mz*SCALE1),ys=b.map(i=>STU[i].Gz*SCALE1),f=slope(xs,ys);
+    const x0=Math.min(...xs),x1=Math.max(...xs),z=bandZ(k);
+    G3.regBands.add(seg([[x0,f.a+f.b*x0,z],[x1,f.a+f.b*x1,z]],new THREE.LineBasicMaterial({color:new THREE.Color(css('--good'))})));
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(6.6,6.6),new THREE.MeshBasicMaterial({color:new THREE.Color(css('--plum')),transparent:true,opacity:.035,side:THREE.DoubleSide,depthWrite:false}));
+    pl.position.set(0,0,z);G3.regBands.add(pl);
+    const t=label(['Low','Middle','High'][k]+' start, r = '+fmt(R_BANDS[k]),{size:.24,color:css('--good'),anchor:'left'});t.position.set(x1+0.15,f.a+f.b*x1,z);G3.regBands.add(t);
+  });
+
+  /* lens 2: floors */
+  const g2=new THREE.Group();G3.g2=g2;scene.add(g2);g2.visible=false;
+  [[-2.3,css('--amber')],[2.3,css('--teal')]].forEach(([x,col])=>{
+    const f=new THREE.Mesh(new THREE.BoxGeometry(2.9,0.06,4.6),new THREE.MeshStandardMaterial({color:new THREE.Color(col),transparent:true,opacity:.22}));
+    f.position.set(x,-2.05,0);g2.add(f);
+  });
+  G3.lab2L=label('Class A (advanced track) with the program',{size:.24,color:css('--amber')});G3.lab2L.position.set(-2.3,-2.45,2.7);g2.add(G3.lab2L);
+  G3.lab2R=label('Class B, as usual',{size:.24,color:css('--teal')});G3.lab2R.position.set(2.3,-2.45,2.7);g2.add(G3.lab2R);
+  G3.meanL=meanPlane(css('--amber'));G3.meanR=meanPlane(css('--teal'));G3.meanL.position.x=-2.3;G3.meanR.position.x=2.3;g2.add(G3.meanL,G3.meanR);
+  G3.meanTL=label('',{size:.26});G3.meanTR=label('',{size:.26});g2.add(G3.meanTL,G3.meanTR);
+
+  /* lens 3: synthesis */
+  const g3=new THREE.Group();G3.g3=g3;scene.add(g3);g3.visible=false;
+  const xd=d=>(d-0.25)*3.4;G3.xd=xd;
+  const yp=se=>-1.9+(1/se-2)*0.62;G3.yp=yp;
+  const rows=SETTINGS.length,zr=k=>-1.95+k*1.3;G3.zr=zr;
+  const ticks=[];[-0.4,0,0.4,0.8,1.2].forEach(d=>{ticks.push([[xd(d),-2.0,-2.6],[xd(d),2.6,-2.6]]);const t=label(fmt(d),{size:.24,color:css('--ink-2')});t.position.set(xd(d),-2.25,2.5);g3.add(t);});
+  g3.add(segs(ticks,lineMat(lineC,1)));
+  g3.add(segs([[[xd(0),-2.0,-2.6],[xd(0),-2.0,2.4]],[[xd(0),-2.0,-2.6],[xd(0),2.6,-2.6]]],lineMat(ink3,.9)));
+  const zeroLab=label('No effect',{size:.24,color:css('--ink-2'),anchor:'right'});zeroLab.position.set(xd(0)-0.08,2.75,-2.6);g3.add(zeroLab);
+  const ex=label('Effect size (d)',{size:.3});ex.position.set(xd(0.4),-2.62,2.5);g3.add(ex);
+  const ey=label('Larger samples ↑',{size:.28,color:css('--ink-2')});ey.position.set(xd(-0.6),2.4,-2.6);g3.add(ey);
+  for(let k=0;k<rows;k++){
+    const strip=new THREE.Mesh(new THREE.PlaneGeometry(7.4,0.9),new THREE.MeshBasicMaterial({color:lineC,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false}));
+    strip.rotation.x=-Math.PI/2;strip.position.set(xd(0.35),-2.0,zr(k));g3.add(strip);
+    const t=label(SETTINGS[k].name,{size:.26,color:css('--ink-2'),anchor:'left'});t.position.set(xd(1.42),-1.9,zr(k));g3.add(t);(G3.rowLabs=G3.rowLabs||[]).push(t);
+  }
+  G3.drawer=new THREE.Mesh(new THREE.BoxGeometry(7.6,1.0,5.6),new THREE.MeshStandardMaterial({color:new THREE.Color(css('--ink-3')),transparent:true,opacity:.42,depthWrite:false}));
+  G3.drawer.position.set(xd(0.35),-3.0,0);g3.add(G3.drawer);
+  G3.drawerLab=label('Unpublished studies',{size:.28,color:css('--ink')});G3.drawerLab.position.set(xd(0.35),-3.75,2.9);g3.add(G3.drawerLab);
+  G3.poolPub=poolPlane(css('--amber'),.18);G3.poolAll=poolPlane(css('--good'),.2);g3.add(G3.poolPub,G3.poolAll);
+  G3.poolPub.position.x=xd(POOL_PUB);G3.poolAll.position.x=xd(POOL_ALL);G3.poolAll.visible=false;
+  G3.poolPubLab=label('Published only  '+fmt(POOL_PUB),{size:.26,color:css('--amber')});G3.poolPubLab.position.set(xd(POOL_PUB),3.15,-2.6);g3.add(G3.poolPubLab);
+  G3.poolAllLab=label('All studies  '+fmt(POOL_ALL),{size:.26,color:css('--good')});G3.poolAllLab.position.set(xd(POOL_ALL),3.55,-2.6);G3.poolAllLab.visible=false;g3.add(G3.poolAllLab);
+  G3.setMarks=new THREE.Group();G3.setMarks.visible=false;g3.add(G3.setMarks);
+  POOL_SET.forEach((d,k)=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.5,1.0),new THREE.MeshStandardMaterial({color:new THREE.Color(css('--ink'))}));
+    m.position.set(xd(d),-1.75,zr(k));G3.setMarks.add(m);
+    const t=label(fmt(d),{size:.24,weight:700});t.position.set(xd(d),-1.3,zr(k));G3.setMarks.add(t);
+  });
+  /* study spheres */
+  const sg=new THREE.SphereGeometry(1,20,14);
+  G3.studies=new THREE.InstancedMesh(sg,new THREE.MeshStandardMaterial({roughness:.55}),STUDIES.length);
+  G3.studies.instanceMatrix.setUsage(THREE.DynamicDrawUsage);g3.add(G3.studies);
+  const pubC=new THREE.Color(css('--indigo')),hidC=new THREE.Color(css('--ink-3'));
+  STUDIES.forEach((t,i)=>{
+    t.r=0.05+Math.sqrt(t.n)*0.0075;
+    t.home=new THREE.Vector3(xd(t.d),yp(t.se),zr(t.s)+((i*37)%5-2)*0.12);
+    t.box=new THREE.Vector3(xd(0.35)+((i*53)%13-6)*0.5,-3.0,((i*29)%7-3)*0.6);
+    t.cur=t.pub?t.home.clone():t.box.clone();
+    t.col=t.pub?pubC.clone():hidC.clone();
+    G3.studies.setColorAt(i,t.col);
+  });
+
+  /* students */
+  const ballG=new THREE.SphereGeometry(0.1,16,12);
+  G3.balls=new THREE.InstancedMesh(ballG,new THREE.MeshStandardMaterial({roughness:.5}),N);
+  G3.balls.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(G3.balls);
+  const colG=new THREE.BoxGeometry(0.24,1,0.24);colG.translate(0,0.5,0);
+  G3.cols=new THREE.InstancedMesh(colG,new THREE.MeshStandardMaterial({roughness:.7}),N);
+  G3.cols.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(G3.cols);
+  G3.ghost=new THREE.InstancedMesh(colG,new THREE.MeshBasicMaterial({color:new THREE.Color(css('--ink')),transparent:true,opacity:.16,depthWrite:false}),N);
+  G3.ghost.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(G3.ghost);
+  for(let i=0;i<N;i++){SP.pos.push(new THREE.Vector3());SP.tgt.push(new THREE.Vector3());SP.scl.push(1);SP.tScl.push(1);SP.h.push(0);SP.tH.push(0);SP.gh.push(0);SP.tGh.push(0);}
+  G3.colorsBall=Array.from({length:N},()=>new THREE.Color());
+  COL_T=new THREE.Color(css('--amber')).lerp(new THREE.Color('#ffffff'),.35);COL_C=new THREE.Color(css('--teal')).lerp(new THREE.Color('#ffffff'),.35);
+  for(let i=0;i<N;i++)G3.cols.setColorAt(i,COL_C);
+}
+function bandZ(k){return st.banded?(k-1)*2.4:0;}
+function meanPlane(col){
+  const g=new THREE.Group();
+  const m=new THREE.Mesh(new THREE.BoxGeometry(2.9,0.025,4.6),new THREE.MeshBasicMaterial({color:new THREE.Color(col),transparent:true,opacity:.35,depthWrite:false}));
+  g.add(m);const e=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(2.9,0.025,4.6)),new THREE.LineBasicMaterial({color:new THREE.Color(col)}));g.add(e);
+  g.visible=false;return g;
+}
+function poolPlane(col,op){
+  const g=new THREE.Group();
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(5.6,5.0),new THREE.MeshBasicMaterial({color:new THREE.Color(col),transparent:true,opacity:op,side:THREE.DoubleSide,depthWrite:false}));
+  m.rotation.y=Math.PI/2;m.position.set(0,0.4,-0.1);g.add(m);
+  g.add(seg([[0,-2.0,-2.6],[0,2.9,-2.6]],new THREE.LineBasicMaterial({color:new THREE.Color(col)})));
+  return g;
+}
+
+/* ---------- layout of students per step ---------- */
+const H_BASE=-2.0;
+function hOf(score){return Math.max(0.06,Math.min(3.6,(score+2.4)*0.42));}
+function slotPos(idxInGroup,left){
+  const col=idxInGroup%6,row=Math.floor(idxInGroup/6);
+  return [(left?-2.3:2.3)+(col-2.5)*0.42,(row-4.5)*0.42];
+}
+function postScore(i){const s=STU[i];return s.G+0.4*sdPre+(st.group[i]?TRUE_EFFECT*sdPre:0)+s.ePost*sdPre;}
+function dropped(i){return st.drop&&st.ran&&st.group[i]&&DROP.has(i);}
+let DROP=new Set();
+function computeDrop(){
+  const T=[...STU.keys()].filter(i=>st.group[i]).sort((a,b)=>STU[a].G-STU[b].G);DROP=new Set(T.slice(0,9));
+}
+function layoutStudents(){
+  const c=new THREE.Color();
+  if(st.step===0){
+    for(let i=0;i<N;i++){const s=STU[i];SP.tgt[i].set(s.Mz*SCALE1,s.Gz*SCALE1,s.Pz*SCALE1+bandZ(s.band));SP.tScl[i]=1;SP.tH[i]=0;SP.tGh[i]=0;
+      if(st.revealed)rampColor((s.Pz+2)/4,G3.colorsBall[i]);else G3.colorsBall[i].set(css('--indigo'));}
+  }else if(st.step===1){
+    const order=[...STU.keys()].sort((a,b)=>STU[b].G-STU[a].G);
+    let a=0,b=0;
+    order.forEach(i=>{
+      const left=st.group[i];const k=left?a++:b++;const [x,z]=slotPos(k,left);
+      const score=st.ran?postScore(i):STU[i].G;const h=hOf(score/sdPre);
+      const gone=dropped(i);
+      SP.tgt[i].set(x,H_BASE+h+0.12+(gone?2.5:0),z);SP.tScl[i]=gone?0:1;SP.tH[i]=gone?0:h;
+      SP.tGh[i]=(st.showPre&&st.ran&&!gone)?hOf(STU[i].G/sdPre):0;
+      rampColor((STU[i].Pz+2)/4,G3.colorsBall[i]);
+      G3.cols.setColorAt(i,left?COL_T:COL_C);
+    });
+    if(G3.cols.instanceColor)G3.cols.instanceColor.needsUpdate=true;
+  }else{
+    for(let i=0;i<N;i++){SP.tScl[i]=0;SP.tH[i]=0;SP.tGh[i]=0;}
+  }
+}
+
+/* ---------- render loop ---------- */
+const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),V=new THREE.Vector3(),SV=new THREE.Vector3();
+let lastFrame=0;
+function frame(t){
+  requestAnimationFrame(frame);
+  const k=reduceMotion?1:0.11;
+  cam.theta+=(cam.dTheta-cam.theta)*0.18;cam.phi+=(cam.dPhi-cam.phi)*0.18;cam.r+=(cam.dR-cam.r)*0.15;
+  cam.tx+=(cam.dtx-cam.tx)*0.15;cam.ty+=(cam.dty-cam.ty)*0.15;cam.tz+=(cam.dtz-cam.tz)*0.15;
+  camera.position.set(cam.tx+cam.r*Math.sin(cam.theta)*Math.cos(cam.phi),cam.ty+cam.r*Math.sin(cam.phi),cam.tz+cam.r*Math.cos(cam.theta)*Math.cos(cam.phi));
+  camera.lookAt(cam.tx,cam.ty,cam.tz);
+  for(let i=0;i<N;i++){
+    SP.pos[i].lerp(SP.tgt[i],k);SP.scl[i]+=(SP.tScl[i]-SP.scl[i])*k;SP.h[i]+=(SP.tH[i]-SP.h[i])*k;SP.gh[i]+=(SP.tGh[i]-SP.gh[i])*k;
+    SV.setScalar(SP.scl[i]);M4.compose(SP.pos[i],Q,SV);G3.balls.setMatrixAt(i,M4);G3.balls.setColorAt(i,G3.colorsBall[i]);
+    V.set(SP.pos[i].x,H_BASE,SP.pos[i].z);SV.set(1,Math.max(0.0001,SP.h[i]),1);M4.compose(V,Q,SV);G3.cols.setMatrixAt(i,M4);
+    SV.set(1.08,Math.max(0.0001,SP.gh[i]),1.08);M4.compose(V,Q,SV);G3.ghost.setMatrixAt(i,M4);
+  }
+  G3.balls.instanceMatrix.needsUpdate=true;if(G3.balls.instanceColor)G3.balls.instanceColor.needsUpdate=true;
+  G3.cols.instanceMatrix.needsUpdate=true;G3.ghost.instanceMatrix.needsUpdate=true;
+  G3.cols.visible=st.step===1;G3.ghost.visible=st.step===1;G3.balls.visible=st.step<2;
+  if(st.step===2){
+    STUDIES.forEach((s,i)=>{const tg=(s.pub||st.drawer)?s.home:s.box;s.cur.lerp(tg,reduceMotion?1:0.07);SV.setScalar(s.r);M4.compose(s.cur,Q,SV);G3.studies.setMatrixAt(i,M4);});
+    G3.studies.instanceMatrix.needsUpdate=true;
+  }
+  if(G3.rowLabs){const facing=Math.abs(Math.sin(cam.theta))<0.3&&cam.phi<0.45;G3.rowLabs.forEach(l=>l.visible=!facing);G3.setMarks.visible=st.perSetting&&!facing;}
+  renderer.render(scene,camera);
+}
+function resize(){
+  if(!renderer)return;const vp=$('viewport');const w=vp.clientWidth,h=vp.clientHeight;
+  renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  const f=fitR(st.step);if(lastFit){cam.dR*=f/lastFit;cam.r*=f/lastFit;}lastFit=f;
+  const narrow=w<560;cam.narrow=narrow;
+}
+
+/* ---------- camera presets ---------- */
+const PRESET={
+  0:{front:[0,0.04,24],side:[Math.PI/2-0.05,0.08,25],top:[0,1.35,25],t:[0,0,0]},
+  1:{front:[0,0.4,29],side:[Math.PI/2,0.3,27],top:[0,1.3,27],t:[0,-0.9,0]},
+  2:{front:[0,0.04,25],side:[Math.PI/2-0.1,0.25,26],top:[0,1.38,24],t:[0.6,-0.4,0]}
+};
+/* camera distance that frames each scene in whatever space the viewport has */
+const FIT={0:[8.8,8.3],1:[10.6,6.9],2:[10.2,7.9]};
+function fitR(step){if(!camera)return 24;const f=FIT[Math.min(step,2)];const t=Math.tan(camera.fov*Math.PI/360);return Math.max(f[1]/2/t,f[0]/2/(t*camera.aspect))*1.02;}
+let lastFit=0;
+function setView(v){
+  const p=PRESET[Math.min(st.step,2)];const a=p[v];
+  cam.dTheta=a[0];cam.dPhi=a[1];cam.dR=fitR(st.step)*(v==='front'?1:1.05);lastFit=fitR(st.step);cam.dtx=p.t[0];cam.dty=p.t[1];cam.dtz=p.t[2];
+  if(st.step===0&&v!=='front')checkReveal(true);
+}
+
+/* ---------- interaction ---------- */
+const ptrs=new Map();let pinch0=0;
+function onDown(e){canvas.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);}}
+function onMove(e){
+  if(!ptrs.has(e.pointerId))return;const p=ptrs.get(e.pointerId);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0){cam.dR=Math.max(6,Math.min(70,cam.dR*pinch0/d));}pinch0=d;return;}
+  cam.dTheta-=dx*0.0085;cam.dPhi=Math.max(-0.25,Math.min(1.45,cam.dPhi+dy*0.0065));checkReveal();
+}
+function onUp(e){ptrs.delete(e.pointerId);pinch0=0;}
+function onWheel(e){e.preventDefault();cam.dR=Math.max(6,Math.min(70,cam.dR*(1+Math.sign(e.deltaY)*0.08)));}
+function onKey(e){
+  const k=e.key;let used=true;
+  if(k==='ArrowLeft')cam.dTheta+=0.15;else if(k==='ArrowRight')cam.dTheta-=0.15;
+  else if(k==='ArrowUp')cam.dPhi=Math.min(1.45,cam.dPhi+0.12);else if(k==='ArrowDown')cam.dPhi=Math.max(-0.25,cam.dPhi-0.12);
+  else if(k==='+'||k==='=')cam.dR=Math.max(6,cam.dR*0.92);else if(k==='-')cam.dR=Math.min(70,cam.dR*1.08);else used=false;
+  if(used){e.preventDefault();checkReveal();}
+}
+function checkReveal(force){
+  if(st.step!==0||st.revealed)return;
+  if(force||Math.abs(Math.sin(cam.dTheta))>0.55||cam.dPhi>0.85){reveal();}
+}
+
+/* ---------- step 1 ---------- */
+function reveal(){
+  st.revealed=true;$('found0').hidden=false;showInPanel($('found0'));$('task0').textContent='You found it. Look at how the colour changes along the depth of the cloud.';
+  if(G3.zQ){G3.zQ.visible=false;G3.zLab.visible=true;}
+  layoutStudents();renderLegend();renderReadout();lockPrediction(0);
+}
+function band(){
+  st.banded=true;layoutStudents();if(G3.regBands){G3.regBands.visible=true;G3.regAll.visible=true;}
+  $('bandBtn').disabled=true;
+  const p=st.pred[0];
+  const pre=p==='weaker'?'Your prediction held: ':(p?'Compare this with your prediction: ':'');
+  $('fb0').innerHTML=`<p>${pre}within each band of students with similar starting points, the link drops from r = ${fmt(R_ALL)} to about r = ${fmt(R_WITHIN)}. It does not vanish, but much of the raw association belonged to prior achievement.</p><p>The pattern is real; the causal story behind it is not settled. Higher grades could also feed motivation.</p>`;
+  $('after0').hidden=false;
+  addRuler();renderReadout();renderLegend();showInPanel($('fb0'));
+  if(!reduceMotion)setTimeout(()=>{if(st.step===0){cam.dTheta=0.55;cam.dPhi=0.32;}},250);
+  complete(0);
+}
+
+/* ---------- step 2 ---------- */
+function setMode(m){
+  st.mode=m;st.ran=false;
+  $('modeExisting').setAttribute('aria-pressed',m==='existing');$('modeRandom').setAttribute('aria-pressed',m==='random');
+  if(m==='existing'){st.group=STU.map(s=>s.classA);}
+  else{lottery();}
+  labelsStep2();$('runBtn').textContent='Run the study';
+  $('intro1').textContent=m==='random'?'Now a lottery decides who joins the program, regardless of class. Each column is a student’s score; the dot on top shows prior achievement.':'A school pilots a motivation program in Class A, its advanced track. Class B continues as usual. Each column is a student’s score; the dot on top shows prior achievement.';
+  layoutStudents();updateMeans();renderReadout();
+}
+function lottery(){
+  const sd=lotteryN<LOTTERY_SEEDS.length?LOTTERY_SEEDS[lotteryN]:500+lotteryN;lotteryN++;const R=mulberry32(1000+sd);const idx=[...STU.keys()];
+  for(let i=idx.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
+  st.group=STU.map(()=>false);idx.slice(0,N/2).forEach(i=>st.group[i]=true);
+}
+function labelsStep2(){
+  if(!G3.lab2L)return;
+  const ex=st.mode==='existing';
+  swapLabel('lab2L',ex?'Class A (advanced track) with the program':'Program group, drawn by chance',css('--amber'),[-2.3,-2.45,2.7]);
+  swapLabel('lab2R',ex?'Class B, as usual':'Comparison group, drawn by chance',css('--teal'),[2.3,-2.45,2.7]);
+}
+function swapLabel(key,text,color,pos,size,anchor){
+  const old=G3[key];const parent=old.parent;parent.remove(old);old.material.map.dispose();old.material.dispose();
+  const n=label(text,{size:size||.24,color,anchor});n.position.set(...pos);parent.add(n);G3[key]=n;
+}
+function groupStats(){
+  const idx=[...STU.keys()].filter(i=>!dropped(i));
+  const T=idx.filter(i=>st.group[i]),C=idx.filter(i=>!st.group[i]);
+  const pre=(mean(T.map(i=>STU[i].G))-mean(C.map(i=>STU[i].G)))/sdPre;
+  const preAll=(mean(STU.filter((s,i)=>st.group[i]).map(s=>s.G))-mean(STU.filter((s,i)=>!st.group[i]).map(s=>s.G)))/sdPre;
+  const post=(mean(T.map(postScore))-mean(C.map(postScore)))/sdPre;
+  return {pre,preAll,post,T,C};
+}
+function updateMeans(){
+  if(!G3.meanL)return;
+  const g=groupStats();
+  const sc=i=>st.ran?postScore(i):STU[i].G;
+  const mT=hOf(mean(g.T.map(sc))/sdPre),mC=hOf(mean(g.C.map(sc))/sdPre);
+  G3.meanL.position.y=H_BASE+mT;G3.meanR.position.y=H_BASE+mC;G3.meanL.visible=G3.meanR.visible=true;
+  swapLabel('meanTL',(st.ran?'Final mean':'Starting mean'),css('--amber'),[-3.85,H_BASE+mT,0],.24,'right');
+  swapLabel('meanTR',(st.ran?'Final mean':'Starting mean'),css('--teal'),[3.85,H_BASE+mC,0],.24,'left');
+}
+function run(){
+  if(st.ran&&st.mode==='random'){lottery();st.ran=false;layoutStudents();}
+  st.ran=true;computeDrop();
+  const g=groupStats();
+  if(!st.drop){
+    if(st.mode==='existing'){st.existingEst=g.post;st.existingRuns=(st.existingRuns||0)+1;}else st.lotteries.push(g.post);
+  }
+  layoutStudents();updateMeans();renderReadout();addRuler();lockPrediction(1);
+  $('runBtn').textContent=st.mode==='random'?'Draw a new lottery and run':'Run again';
+  feedback1(g);
+  updateGate1();
+}
+function updateGate1(){
+  const n=Math.min(3,st.lotteries.length),ex=st.existingEst!==null;
+  let h=`<li class="${ex?'ok':''}">Run the study with existing classes</li><li class="${n>=3?'ok':''}">Run at least three chance assignments (${n} of 3)</li>`;
+  if(st.drop)h+=`<li class="warn">Runs with dropout are not recorded on the ruler. Untick the dropout box to record your results.</li>`;
+  if(ex&&n>=3&&!st.done[1]){$('after1').hidden=false;complete(1);setTimeout(()=>showInPanel($('after1')),60);}
+  if(st.done[1])h+=`<li class="ok">Step 3 is unlocked</li>`;
+  $('gate1').innerHTML=h;
+}
+function feedback1(g){
+  const p=st.pred[1];let h='';
+  if(st.drop){
+    h=`<div class="note warn"><p>With nine low scorers gone from the program class, the final gap is ${fmt(g.post)} SD. The students who left were not a random sample, so the remaining group looks stronger than the program made it. This is differential attrition. Readings with dropout are not added to the ruler.</p></div>`;
+  }else if(st.mode==='existing'){
+    const share=Math.max(0,Math.min(1,(g.post-g.preAll)/g.post));
+    h=`<div class="note warn"><p>${st.existingRuns>1?'Same classes, same result: rerunning cannot remove a difference that existed before the program. ':''}Class A finished ${fmt(g.post)} SD ahead. Turn on the pretest: Class A was already ${fmt(g.preAll)} SD ahead before the program started, so the program accounts for roughly ${Math.round(share*100)}% of the final gap.${p==='small'?' Your prediction held.':''}</p><p>Now switch to <strong>Assign by chance</strong> and run several lotteries.</p></div>`;
+  }else{
+    const n=st.lotteries.length,m=mean(st.lotteries);
+    const lo=Math.min(...st.lotteries),hi=Math.max(...st.lotteries);
+    h=`<div class="note"><p>Lottery ${n}: the groups started ${fmt(g.preAll)} SD apart and finished ${fmt(g.post)} SD apart.</p>${n>=2?`<p>Across ${n} lotteries the gap averages ${fmt(m)} SD and ranges from ${fmt(lo)} to ${fmt(hi)}. Chance assignment removes systematic differences; what remains is sampling noise around the program’s effect.</p>`:'<p>Run more lotteries to see how much a single result can move by chance.</p>'}</div>`;
+  }
+  $('fb1').innerHTML=h;showInPanel($('fb1'));
+}
+
+/* ---------- step 3 ---------- */
+function openDrawer(){
+  st.drawer=true;$('drawerBtn').disabled=true;$('setTog').disabled=false;lockPrediction(2);
+  if(G3.poolAll){G3.poolAll.visible=true;G3.poolAllLab.visible=true;G3.drawer.material.opacity=.08;
+    const pubC=new THREE.Color(css('--indigo')),unC=new THREE.Color(css('--red'));
+    STUDIES.forEach((t,i)=>{G3.studies.setColorAt(i,t.pub?pubC:unC);});G3.studies.instanceColor.needsUpdate=true;}
+  const nu=STUDIES.filter(t=>!t.pub).length,np=STUDIES.length-nu;const p=st.pred[2];
+  $('fb2').innerHTML=`<div class="note warn"><p>${p==='down'?'Your prediction held. ':''}${nu} unpublished studies join the ${np} published ones (shown in red). Most are small and found weak or null effects, which is why they stayed in the drawer. The pooled effect falls from ${fmt(POOL_PUB)} to ${fmt(POOL_ALL)}.</p><p>Look from the front: with the drawer closed, the lower-left of the funnel was empty. That gap is the signature of publication bias.</p></div>`;
+  renderReadout();renderLegend();addRuler();
+  $('after2').hidden=false;complete(2);showInPanel($('fb2'));
+}
+function perSetting(on){
+  st.perSetting=on;if(G3.setMarks)G3.setMarks.visible=on;
+  if(on){
+    setTimeout(()=>showInPanel($('hetNote')),30);$('fb2').insertAdjacentHTML('beforeend',`<div class="note" id="hetNote"><p>The same program averages ${fmt(POOL_SET[0])} in primary schools and ${fmt(POOL_SET[3])} at university. One pooled number hides this spread. A result from one setting is a hypothesis for another, not a guarantee. Try the top view.</p></div>`);
+  }else{const n=$('hetNote');if(n)n.remove();}
+}
+
+/* ---------- step 4 ---------- */
+const OPTIONS=[
+  {k:'a',t:'Raising motivation strongly raises grades. The survey, the class comparison and the published literature all point the same way.',
+   f:'Three readings agreeing is not the same as three good readings. Each of those large numbers carried a known threat: a third variable, pre-existing class differences and missing studies.'},
+  {k:'b',t:'Raising motivation probably has a modest positive effect on grades, smaller than the raw correlation or the published literature suggest, and it varies by setting.',f:'',ok:true},
+  {k:'c',t:'Motivation has no real effect on grades. Once prior achievement is taken into account, the link disappears.',
+   f:'The link weakens; it does not disappear. Chance assignment and the full synthesis both show a small positive effect.'},
+  {k:'d',t:'The three designs disagree, so the evidence cannot inform a teaching decision.',
+   f:'This swaps passive acceptance for unfounded scepticism. The readings differ for reasons you can name, and the corrected ones converge.'}
+];
+function renderOptions(){
+  $('opts').innerHTML='';
+  OPTIONS.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o.t;b.dataset.k=o.k;
+    b.addEventListener('click',()=>choose(o,b));$('opts').appendChild(b);});
+}
+function choose(o,b){
+  st.verdict=o.k;
+  [...$('opts').children].forEach(x=>x.classList.remove('right','wrong'));
+  b.classList.add(o.ok?'right':'wrong');
+  if(o.ok){
+    $('fb3').innerHTML=`<div class="note"><p>That is the warranted claim. The simulation behind this lab was built with a true effect of ${fmt(TRUE_EFFECT)} SD, now marked on the ruler. The filled markers cluster near it; the hollow ones drifted away for reasons you identified.</p><p>Triangulation does not mean averaging the three lenses. It means asking why each reading differs, discounting the ones with unaddressed threats, and treating the result as a hypothesis to monitor in your own setting.</p></div>`;
+    st.showTruth=true;addRuler();complete(3);showInPanel($('fb3'));
+  }else{$('fb3').innerHTML=`<div class="note warn"><p>${o.f}</p><p>Try another conclusion.</p></div>`;showInPanel($('fb3'));}
+}
+
+/* ---------- readout, legend ---------- */
+function renderReadout(){
+  const r=$('readout');let h='';
+  if(st.step===0){
+    h+=`<div class="stat naive">All students r =<b>${fmt(R_ALL)}</b></div>`;
+    if(st.banded)h+=`<div class="stat better">Within similar starting points r ≈<b>${fmt(R_WITHIN)}</b></div>`;
+  }else if(st.step===1){
+    const g=groupStats();
+    if(st.ran){h+=`<div class="stat ${st.mode==='existing'?'naive':'better'}">Final-score gap<b>${fmt(g.post)} SD</b></div>`;
+      if(st.showPre)h+=`<div class="stat">Gap before the program<b>${fmt(g.preAll)} SD</b></div>`;}
+    else h+=`<div class="stat">Gap before the program<b>${fmt(g.preAll)} SD</b></div>`;
+  }else if(st.step===2){
+    h+=`<div class="stat naive">Pooled, published only<b>${fmt(POOL_PUB)}</b></div>`;
+    if(st.drawer)h+=`<div class="stat better">Pooled, all studies<b>${fmt(POOL_ALL)}</b></div>`;
+  }
+  r.innerHTML=h;
+}
+function renderLegend(){
+  const L=$('legend');
+  if(st.step===0)L.innerHTML=st.revealed?`<span>Prior achievement</span><div class="ramp"></div><div class="ends"><span>lower</span><span>higher</span></div><span><span class="sw" style="background:var(--amber)"></span>Fit for all students</span>${st.banded?'<span><span class="sw" style="background:var(--good)"></span>Fit within a band</span>':''}`:`<span><span class="sw" style="background:var(--indigo);border-radius:50%"></span>One student</span>`;
+  else if(st.step===1)L.innerHTML=`<span>Dot: prior achievement</span><div class="ramp"></div><div class="ends"><span>lower</span><span>higher</span></div><span>Column height: score</span>`;
+  else if(st.step===2)L.innerHTML=`<span><span class="sw" style="background:var(--indigo);border-radius:50%"></span>Published study</span>${st.drawer?'<span><span class="sw" style="background:var(--red);border-radius:50%"></span>Unpublished study</span>':''}<span>Sphere size: sample size</span>`;
+  else L.innerHTML='';
+  L.hidden=!L.innerHTML;
+}
+
+/* ---------- evidence ruler (SVG) ---------- */
+const seenMarks=new Set();let rulerPrimed=false;
+function addRuler(){
+  const svg=$('rulerSvg');const W=Math.max(300,Math.round(svg.getBoundingClientRect().width||800));
+  const narrow=W<560,H=narrow?108:150;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const x0=narrow?66:96,x1=W-(narrow?14:24),lo=-0.2,hi=1.0;const X=v=>x0+(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*(x1-x0);
+  const ink=css('--ink'),ink2=css('--ink-2'),line=css('--line'),amber=css('--amber'),teal=css('--good'),plum=css('--plum');
+  const top=narrow?22:28,gap=narrow?24:36,fs=narrow?10:11.5,F='font-family="DM Sans,Arial,sans-serif"';
+  const rows=[{y:top,name:'Survey'},{y:top+gap,name:'Classes'},{y:top+2*gap,name:'Synthesis'}];
+  const axisY=top+2*gap+(narrow?17:20);
+  let s='';
+  const isNew=k=>{const n=!seenMarks.has(k);seenMarks.add(k);return n&&rulerPrimed;};
+  const flashRows=new Set();
+  for(let v=-0.2;v<=1.0001;v+=0.2){const x=X(v);s+=`<line x1="${x}" y1="${top-12}" x2="${x}" y2="${axisY-10}" stroke="${line}" stroke-width="${Math.abs(v)<1e-6?2:1}"/><text x="${x}" y="${axisY+2}" font-size="${fs}" text-anchor="middle" fill="${ink2}" ${F}>${fmt(v)}</text>`;}
+  s+=`<text x="${X(0)}" y="${top-15}" font-size="${fs-1}" text-anchor="middle" fill="${ink2}" ${F}>no effect</text>`;
+  let marks='';
+  const lab=(full,short)=>narrow?short:full;
+  const mk=(kind,key,v,y,label,c,up,row)=>{const pop=isNew(key);if(pop)flashRows.add(row);const cls=pop?' class="pop"':'';
+    const circ=kind==='h'?`<circle${cls} cx="${X(v)}" cy="${y}" r="${narrow?5.5:6.5}" fill="var(--panel)" stroke="${c}" stroke-width="2.4"><title>${label}: ${fmt(v)}</title></circle>`
+                         :`<circle${cls} cx="${X(v)}" cy="${y}" r="${narrow?6:7}" fill="${c}"><title>${label}: ${fmt(v)}</title></circle>`;
+    return circ+`<text x="${X(v)}" y="${up?y-10:y+(narrow?15:18)}" font-size="${fs-0.5}" text-anchor="middle" fill="${c}" ${F} font-weight="${kind==='h'?500:650}">${label} ${fmt(v)}</text>`;};
+  const said=[];
+  if(st.banded){marks+=mk('h','r_all',R_ALL,rows[0].y,lab('raw r','raw'),amber,true,0)+mk('f','r_in',R_WITHIN,rows[0].y,lab('within bands','within'),teal,false,0);said.push(`survey: raw ${fmt(R_ALL)}, within bands ${fmt(R_WITHIN)}`);}
+  if(st.existingEst!==null){marks+=mk('h','ex',st.existingEst,rows[1].y,lab('existing classes','existing'),amber,true,1);said.push(`existing classes ${fmt(st.existingEst)}`);}
+  st.lotteries.forEach((v,i)=>{const pop=isNew('lot'+i);if(pop)flashRows.add(1);marks+=`<circle${pop?' class="pop"':''} cx="${X(v)}" cy="${rows[1].y}" r="3.3" fill="${teal}" opacity=".6"/>`;});
+  if(st.lotteries.length>=2){const m=mean(st.lotteries);marks+=mk('f','lotm',m,rows[1].y,lab('chance, mean of '+st.lotteries.length,'chance ×'+st.lotteries.length),teal,false,1);said.push(`chance assignment mean ${fmt(m)}`);}
+  if(st.maxStep>=2||st.drawer)marks+=mk('h','pub',POOL_PUB,rows[2].y,lab('published only','published'),amber,true,2);
+  if(st.drawer){marks+=mk('f','all',POOL_ALL,rows[2].y,lab('all studies','all'),teal,false,2);said.push(`synthesis: published ${fmt(POOL_PUB)}, all ${fmt(POOL_ALL)}`);}
+  rows.forEach((r,i)=>{
+    if(flashRows.has(i))s+=`<rect class="flash" x="0" y="${r.y-gap/2}" width="${W}" height="${gap}" fill="${plum}" opacity="0" rx="4"/>`;
+    s+=`<text x="0" y="${r.y+4}" font-size="${narrow?11:12.5}" fill="${ink}" ${F} font-weight="600">${r.name}</text><line x1="${x0}" y1="${r.y}" x2="${x1}" y2="${r.y}" stroke="${line}" stroke-dasharray="2 4"/>`;
+  });
+  s+=marks;
+  if(st.showTruth){const x=X(TRUE_EFFECT);isNew('truth');s+=`<line x1="${x}" y1="${top-12}" x2="${x}" y2="${axisY-10}" stroke="${plum}" stroke-width="2.5" stroke-dasharray="6 4"/><text x="${x+5}" y="${top-15}" font-size="${fs-0.5}" fill="${plum}" ${F} font-weight="700">built-in effect ${fmt(TRUE_EFFECT)}</text>`;}
+  if(!marks&&!st.showTruth)s+=`<text x="${(x0+x1)/2}" y="${rows[1].y+4}" font-size="${fs+1}" text-anchor="middle" fill="${ink2}" ${F}>Your readings will appear here as you work through the steps.</text>`;
+  svg.innerHTML=s;rulerPrimed=true;
+  $('rulerText').textContent=said.length?'Ruler readings: '+said.join('; ')+'.':'';
+}
+
+/* ---------- steps & predictions ---------- */
+function lockPrediction(k){const box=$('pred'+k);[...box.querySelectorAll('.chip')].forEach(c=>c.disabled=true);}
+function complete(k){st.done[k]=true;$('tab'+k).classList.add('done');if(k<3){st.maxStep=Math.max(st.maxStep,k+1);$('tab'+(k+1)).setAttribute('aria-disabled','false');}$('lockNote').hidden=true;postHeight();}
+function go(k){
+  st.step=k;$('step'+k).scrollTop=0;for(let i=0;i<4;i++){$('tab'+i).setAttribute('aria-selected',i===k);$('step'+i).hidden=i!==k;}
+  if(THREEOK&&G3.g1){G3.g1.visible=k===0;G3.g2.visible=k===1;G3.g3.visible=k===2||k===3;}
+  if(k===3&&THREEOK){/* keep synthesis scene */}
+  layoutStudents();renderReadout();renderLegend();addRuler();
+  if(THREEOK)setView(k===2?'front':(k===1?'front':'front'));
+  $('hint').hidden=k===3;postHeight();
+}
+document.querySelectorAll('.predict').forEach((box,k)=>{
+  box.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+    st.pred[k]=c.dataset.p;box.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));
+  }));
+});
+const LOCK_MSG=['',
+  'Step 2 opens after step 1: rotate the cloud to find the hidden variable, then hold prior achievement constant.',
+  'Step 3 opens after step 2: run the study once with existing classes and at least three times with chance assignment, with the dropout box unticked.',
+  'Step 4 opens after step 3: open the file drawer to add the unpublished studies.'];
+let lockTimer=null;
+for(let i=0;i<4;i++)$('tab'+i).addEventListener('click',()=>{
+  if($('tab'+i).getAttribute('aria-disabled')==='true'){
+    const n=$('lockNote');n.textContent=LOCK_MSG[i];n.hidden=false;clearTimeout(lockTimer);lockTimer=setTimeout(()=>{n.hidden=true;postHeight();},7000);postHeight();return;
+  }
+  go(i);
+});
+$('step0').parentElement.querySelector('.steps').addEventListener('keydown',e=>{
+  if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const tabs=[0,1,2,3].map(i=>$('tab'+i)).filter(t=>t.getAttribute('aria-disabled')!=='true');
+  const cur=tabs.indexOf(document.activeElement);if(cur<0)return;const n=tabs[(cur+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];n.focus();n.click();
+});
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{go(+b.dataset.go);$('tab'+b.dataset.go).focus();}));
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+$('bandBtn').addEventListener('click',band);
+$('modeExisting').addEventListener('click',()=>setMode('existing'));
+$('modeRandom').addEventListener('click',()=>setMode('random'));
+$('runBtn').addEventListener('click',run);
+$('preTog').addEventListener('change',e=>{st.showPre=e.target.checked;layoutStudents();renderReadout();});
+$('dropTog').addEventListener('change',e=>{st.drop=e.target.checked;updateGate1();st.ran=false;$('fb1').innerHTML='';$('runBtn').textContent='Run the study';layoutStudents();updateMeans();renderReadout();});
+$('drawerBtn').addEventListener('click',openDrawer);
+$('setTog').addEventListener('change',e=>perSetting(e.target.checked));
+$('resetBtn').addEventListener('click',()=>location.reload());
+
+/* ---------- height reporting for embedding ---------- */
+let lastH=0;
+function postHeight(){const h=Math.ceil($('lab').getBoundingClientRect().height);if(Math.abs(h-lastH)<3)return;lastH=h;try{parent.postMessage({type:'hidden-dimension-lab-height',height:h},'*');}catch(e){}}
+window.addEventListener('resize',()=>{fitHeight();resize();addRuler();postHeight();});
+
+/* ---------- fit the whole lab in one screen ---------- */
+function fitHeight(){
+  const sh=(window.screen&&screen.availHeight)||900, narrow=document.documentElement.clientWidth<860;
+  const h=narrow?Math.max(640,Math.min(860,sh-110)):Math.max(580,Math.min(800,sh-250));
+  document.documentElement.style.setProperty('--appH',h+'px');
+  document.documentElement.classList.toggle('short',!narrow&&h<640);
+}
+fitHeight();
+/* keep newly shown feedback visible inside the step panel (never scrolls the page) */
+function showInPanel(el){
+  if(!el||el.hidden)return;const sc=el.closest('.step');if(!sc)return;
+  requestAnimationFrame(()=>{const r=el.getBoundingClientRect(),b=sc.getBoundingClientRect();
+    let d=0;if(r.bottom>b.bottom-8)d=Math.min(r.bottom-b.bottom+12,r.top-b.top-8);else if(r.top<b.top)d=r.top-b.top-8;
+    if(d)sc.scrollTo({top:sc.scrollTop+d,behavior:reduceMotion?'auto':'smooth'});});
+}
+
+/* ---------- full screen ---------- */
+const stageEl=$('stage'),fsBtn=$('fsBtn');
+let hostFrame=null,hostStyle='';try{hostFrame=window.frameElement;}catch(e){hostFrame=null;}
+function fsElement(){return document.fullscreenElement||document.webkitFullscreenElement;}
+function syncFs(){
+  const on=fsElement()===stageEl||stageEl.classList.contains('fs-fallback');
+  stageEl.classList.toggle('fs-on',on);fsBtn.textContent=on?'Exit full screen':'Full screen';fsBtn.setAttribute('aria-pressed',on);
+  ptrs.clear();pinch0=0;setTimeout(()=>{resize();addRuler();},60);
+}
+/* when the browser refuses real full screen (iPhone, or an embed without permission),
+   cover the window instead, and stretch the host iframe too when the page allows it */
+function stretchHost(on){
+  if(!hostFrame)return;
+  try{
+    if(on){hostStyle=hostFrame.getAttribute('style')||'';hostFrame.style.cssText=hostStyle+';position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;border:0;background:#fbfcfc';hostFrame.ownerDocument.documentElement.style.overflow='hidden';}
+    else{hostFrame.setAttribute('style',hostStyle);hostFrame.ownerDocument.documentElement.style.overflow='';}
+  }catch(e){}
+}
+function fallbackOn(){stretchHost(true);stageEl.classList.add('fs-fallback');document.documentElement.style.overflow='hidden';syncFs();}
+function fallbackOff(){stageEl.classList.remove('fs-fallback');document.documentElement.style.overflow='';stretchHost(false);syncFs();}
+fsBtn.addEventListener('click',()=>{
+  if(fsElement()===stageEl){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return;}
+  if(stageEl.classList.contains('fs-fallback')){fallbackOff();return;}
+  const req=stageEl.requestFullscreen||stageEl.webkitRequestFullscreen;
+  if(req){try{const p=req.call(stageEl);if(p&&p.catch)p.catch(fallbackOn);}catch(e){fallbackOn();}}else fallbackOn();
+});
+document.addEventListener('fullscreenchange',syncFs);document.addEventListener('webkitfullscreenchange',syncFs);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&stageEl.classList.contains('fs-fallback'))fallbackOff();});
+
+/* ---------- boot ---------- */
+function boot(){
+  renderOptions();
+  if(THREEOK){
+    try{initScene();}catch(err){THREEOK=false;console.error(err);}
+  }
+  if(!THREEOK){$('fallback').hidden=false;$('hint').hidden=true;canvas.hidden=true;
+    /* without 3D, allow the survey step to proceed by button */
+    $('task0').innerHTML='The 3D view is unavailable here. <button class="act quiet" type="button" id="noGL">Reveal the third variable</button>';
+    $('noGL').addEventListener('click',reveal);
+  }else{
+    canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointermove',onMove);
+    canvas.addEventListener('pointerup',onUp);canvas.addEventListener('pointercancel',onUp);
+    canvas.addEventListener('wheel',onWheel,{passive:false});canvas.addEventListener('keydown',onKey);
+    labelsStep2();
+    for(let i=0;i<N;i++){const s=STU[i];SP.pos[i].set(s.Mz*SCALE1,s.Gz*SCALE1,s.Pz*SCALE1);}
+    resize();requestAnimationFrame(frame);
+  }
+  go(0);setMode('existing');go(0);updateGate1();
+  new ResizeObserver(()=>{resize();}).observe($('viewport'));
+  new ResizeObserver(()=>postHeight()).observe($('lab'));
+  let rw=0;new ResizeObserver(()=>{const w=Math.round($('rulerSvg').getBoundingClientRect().width);if(w!==rw){rw=w;addRuler();}}).observe($('rulerSvg'));
+  setTimeout(postHeight,300);
+}
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(boot);
+})();
+</script>
+</body>
+</html>
